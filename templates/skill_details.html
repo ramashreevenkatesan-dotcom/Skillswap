@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}{{ skill.title }} — Skill Details | SkillSwap{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Breadcrumb -->
+  <div style="margin-bottom: 1.5rem; font-size: 0.85rem; color: var(--text-dim);">
+    <a href="{{ url_for('learn') }}" style="color: var(--cyan-highlight);">&larr; Back to Learn Catalog</a>
+    <span style="margin: 0 0.5rem;">/</span>
+    <span>{{ skill.category }}</span>
+    <span style="margin: 0 0.5rem;">/</span>
+    <span style="color: var(--text-muted);">{{ skill.title }}</span>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; align-items: flex-start;">
+    <!-- Main Left Column: Skill Information -->
+    <div>
+      <div class="glass-card" style="padding: 2.25rem; margin-bottom: 2rem;">
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.85rem; flex-wrap: wrap;">
+          <span class="badge badge-category">{{ skill.category }}</span>
+          <span class="badge badge-level">{{ skill.experience_level }}</span>
+          {% if skill.status == 'active' %}
+            <span class="badge badge-accepted">Active Offering</span>
+          {% else %}
+            <span class="badge badge-cancelled">Paused</span>
+          {% endif %}
+        </div>
+
+        <h1 style="font-size: 2.25rem; margin-bottom: 1rem; color: #fff;">{{ skill.title }}</h1>
+
+        <!-- Quick Summary Bar -->
+        <div style="display: flex; flex-wrap: wrap; gap: 1.25rem; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.05); margin-bottom: 1.75rem; font-size: 0.875rem;">
+          <div>
+            <span style="color: var(--text-dim); display: block; font-size: 0.75rem;">DURATION</span>
+            <strong style="color: #fff;">{{ skill.session_duration }}</strong>
+          </div>
+          <div>
+            <span style="color: var(--text-dim); display: block; font-size: 0.75rem;">LEARNING MODE</span>
+            <strong style="color: #fff;">{{ skill.learning_mode }}</strong>
+          </div>
+          <div>
+            <span style="color: var(--text-dim); display: block; font-size: 0.75rem;">LANGUAGE</span>
+            <strong style="color: #fff;">{{ skill.teaching_language }}</strong>
+          </div>
+          <div>
+            <span style="color: var(--text-dim); display: block; font-size: 0.75rem;">DAYS</span>
+            <strong style="color: #fff;">{{ skill.available_days }}</strong>
+          </div>
+          <div>
+            <span style="color: var(--text-dim); display: block; font-size: 0.75rem;">TIMES</span>
+            <strong style="color: #fff;">{{ skill.available_times }}</strong>
+          </div>
+        </div>
+
+        <!-- Detailed Description -->
+        <div style="margin-bottom: 2rem;">
+          <h2 style="font-size: 1.25rem; color: #fff; margin-bottom: 0.75rem;">Description & Syllabus</h2>
+          <p style="color: var(--text-light); line-height: 1.7; font-size: 0.975rem; white-space: pre-line;">
+            {{ skill.description }}
+          </p>
+        </div>
+
+        <!-- Expected Learning Outcomes -->
+        <div style="margin-bottom: 2rem;">
+          <h2 style="font-size: 1.25rem; color: #fff; margin-bottom: 0.75rem;">Expected Learning Outcomes</h2>
+          <div style="background: rgba(0, 242, 254, 0.05); border-left: 3px solid var(--cyan-highlight); padding: 1rem 1.25rem; border-radius: var(--radius-sm); color: var(--text-light); font-size: 0.95rem; line-height: 1.6;">
+            {{ skill.outcomes }}
+          </div>
+        </div>
+
+        <!-- Learning Resources Provided -->
+        <div style="margin-bottom: 1rem;">
+          <h2 style="font-size: 1.25rem; color: #fff; margin-bottom: 0.75rem;">Resources & Materials Provided</h2>
+          <div style="background: rgba(139, 92, 246, 0.05); border-left: 3px solid var(--primary-violet); padding: 1rem 1.25rem; border-radius: var(--radius-sm); color: var(--text-light); font-size: 0.95rem; line-height: 1.6;">
+            {{ skill.resources }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Peer Reviews for this Skill / Instructor -->
+      <div class="glass-card" style="padding: 2rem;">
+        <h2 style="font-size: 1.35rem; color: #fff; margin-bottom: 1rem;">
+          Peer Reviews & Feedback
+          {% if reviews %}
+            <span style="font-size: 0.9rem; color: var(--text-muted); font-weight: 400;">({{ reviews|length }} reviews)</span>
+          {% endif %}
+        </h2>
+
+        {% if reviews %}
+          <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+            {% for r in reviews %}
+              <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 1.25rem; border-radius: var(--radius-md);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div class="teacher-avatar-mini">{{ r.reviewer.initials }}</div>
+                    <strong style="color: #fff; font-size: 0.9rem;">{{ r.reviewer.full_name }}</strong>
+                  </div>
+                  <div style="color: #FBBF24; font-size: 0.95rem;">
+                    {% for _ in range(r.rating) %}★{% endfor %}
+                    <span style="color: var(--text-dim); font-size: 0.8rem; margin-left: 0.25rem;">{{ r.rating }}/5</span>
+                  </div>
+                </div>
+                <p style="color: var(--text-light); font-size: 0.9rem; line-height: 1.5;">{{ r.comment }}</p>
+                <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.5rem;">
+                  Completed on {{ r.created_at.strftime('%B %d, %Y') }}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-state" style="padding: 1.5rem;">
+            <p class="empty-desc" style="margin-bottom: 0;">No reviews written yet for this listing. Be among the first to learn and leave feedback!</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Right Sidebar: Teacher Card & Request CTA -->
+    <div>
+      <div class="glass-card" style="padding: 2rem; position: sticky; top: 90px;">
+        <!-- Teacher Profile Summary -->
+        <div style="text-align: center; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+          <div class="user-avatar-circle" style="width: 72px; height: 72px; font-size: 1.5rem; margin: 0 auto 1rem;">
+            {{ skill.teacher.initials }}
+          </div>
+          <h3 style="font-size: 1.25rem; color: #fff; margin-bottom: 0.2rem;">
+            <a href="{{ url_for('public_profile', username=skill.teacher.username) }}">{{ skill.teacher.full_name }}</a>
+          </h3>
+          <div style="font-size: 0.85rem; color: var(--cyan-highlight); margin-bottom: 0.25rem;">{{ skill.teacher.department }}</div>
+          <div style="font-size: 0.8rem; color: var(--text-dim);">{{ skill.teacher.institution }}</div>
+
+          {% if skill.teacher.average_rating %}
+            <div style="display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); padding: 0.25rem 0.65rem; border-radius: var(--radius-full); margin-top: 0.75rem; color: #FBBF24; font-size: 0.825rem; font-weight: 600;">
+              ★ {{ skill.teacher.average_rating }} ({{ skill.teacher.review_count }} reviews)
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Instructor Bio snippet -->
+        <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem;">
+          {{ skill.teacher.biography }}
+        </p>
+
+        <!-- CTA Buttons -->
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;" id="request">
+          {% if is_owner %}
+            <div style="background: rgba(139, 92, 246, 0.15); border: 1px solid var(--border-glass); padding: 0.85rem; border-radius: var(--radius-md); text-align: center; font-size: 0.875rem; color: var(--text-light);">
+              This is your skill listing. You cannot request your own skill.
+            </div>
+            <a href="{{ url_for('teach') }}" class="btn btn-secondary btn-sm" style="width: 100%;">
+              Manage in Teach Module
+            </a>
+          {% else %}
+            {% if current_user %}
+              <button 
+                type="button" 
+                class="btn btn-cyan btn-lg open-learn-request-btn" 
+                data-skill-id="{{ skill.id }}" 
+                data-skill-title="{{ skill.title }}" 
+                data-teacher-name="{{ skill.teacher.full_name }}" 
+                style="width: 100%;"
+              >
+                Request to Learn
+              </button>
+            {% else %}
+              <a href="{{ url_for('login', next=url_for('skill_details', skill_id=skill.id)) }}" class="btn btn-cyan btn-lg" style="width: 100%;">
+                Log In to Request
+              </a>
+            {% endif %}
+
+            <a href="{{ url_for('public_profile', username=skill.teacher.username) }}" class="btn btn-secondary" style="width: 100%;">
+              View Teacher Profile
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Reusable Request to Learn Modal -->
+<div class="modal-overlay" id="request-to-learn-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 style="font-size: 1.25rem; color: #fff;">Request to Learn Skill</h3>
+      <button type="button" class="modal-close-btn" aria-label="Close modal">&times;</button>
+    </div>
+
+    <div style="background: rgba(139, 92, 246, 0.12); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.25rem;">
+      <div style="font-size: 0.775rem; color: var(--cyan-highlight); font-weight: 600; text-transform: uppercase;">Selected Skill Offering</div>
+      <div id="modal-request-skill-title" style="font-weight: 700; font-size: 1.05rem; color: #fff; margin: 0.2rem 0;">{{ skill.title }}</div>
+      <div style="font-size: 0.85rem; color: var(--text-muted);">
+        Instructor: <strong id="modal-request-teacher-name" style="color: #fff;">{{ skill.teacher.full_name }}</strong>
+      </div>
+    </div>
+
+    <form action="{{ url_for('request_to_learn') }}" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="skill_id" id="modal-request-skill-id" value="{{ skill.id }}">
+
+      <div class="form-group">
+        <label for="detail-modal-goal" class="form-label">Your Learning Goal & Objectives *</label>
+        <textarea name="message" id="detail-modal-goal" class="form-control" rows="3" placeholder="Explain what topics or projects you want help with..." required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="detail-modal-days" class="form-label">Preferred Days</label>
+        <input type="text" name="preferred_days" id="detail-modal-days" class="form-control" value="{{ skill.available_days }}">
+      </div>
+
+      <div class="form-group">
+        <label for="detail-modal-times" class="form-label">Preferred Times</label>
+        <input type="text" name="preferred_time" id="detail-modal-times" class="form-control" value="{{ skill.available_times }}">
+      </div>
+
+      <div class="form-group">
+        <label for="detail-modal-mode" class="form-label">Preferred Learning Mode</label>
+        <select name="learning_mode" id="detail-modal-mode" class="form-control">
+          <option value="Online" {% if skill.learning_mode == 'Online' %}selected{% endif %}>Online</option>
+          <option value="In-Person" {% if skill.learning_mode == 'In-Person' %}selected{% endif %}>In-Person</option>
+          <option value="Hybrid" {% if skill.learning_mode == 'Hybrid' %}selected{% endif %}>Hybrid</option>
+        </select>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('request-to-learn-modal')">Cancel</button>
+        <button type="submit" class="btn btn-cyan btn-sm">Send Learning Request</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/learn.js') }}"></script>
+{% endblock %}

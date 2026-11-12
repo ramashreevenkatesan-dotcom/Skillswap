@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}Find Your Perfect Skill Exchange — SkillSwap{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Header -->
+  <div style="margin-bottom: 2rem; text-align: center;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(112, 0, 255, 0.15)); border: 1px solid var(--border-glass-bright); padding: 0.35rem 1rem; border-radius: var(--radius-full); margin-bottom: 1rem;">
+      <span style="color: var(--cyan-highlight); font-size: 0.8rem; font-weight: 600;">Deterministic Rule-Based Matching</span>
+    </div>
+    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Find Your Perfect Skill Exchange</h1>
+    <p class="lead-text" style="margin: 0 auto;">Teach what you know. Learn what you want.</p>
+  </div>
+
+  <!-- Transparent Algorithm Explanation Card -->
+  <div class="glass-card" style="padding: 1.25rem 1.75rem; margin-bottom: 2rem; background: rgba(10, 14, 26, 0.6); border-left: 4px solid var(--cyan-highlight);">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--cyan-highlight)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+      <h3 style="font-size: 1.05rem; color: #fff;">How the SkillSwap Matching Engine Works</h3>
+    </div>
+    <p style="font-size: 0.85rem; color: var(--text-light); line-height: 1.5;">
+      Our matching engine performs <strong>bilateral cross-referencing</strong> between your published teaching skills and learning wishlist against all active student peers.
+      A <strong>Strong Reciprocal Match</strong> is verified when you teach what they want to learn <em>AND</em> they teach what you want to learn.
+      Compatibility scores further factor in matching learning modes (Online/In-Person) and language preferences.
+    </p>
+  </div>
+
+  <!-- Filter Pills -->
+  <div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+    <button type="button" class="btn btn-secondary btn-sm match-filter-btn active" data-filter="all">
+      All Matches ({{ matches|length }})
+    </button>
+    <button type="button" class="btn btn-secondary btn-sm match-filter-btn" data-filter="Strong Reciprocal Match">
+      Strong Reciprocal Matches
+    </button>
+    <button type="button" class="btn btn-secondary btn-sm match-filter-btn" data-filter="Partial Match">
+      Partial Matches
+    </button>
+  </div>
+
+  <!-- Matches Listing -->
+  {% if matches %}
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      {% for match in matches %}
+        <div class="glass-card glass-card-hover match-card-wrapper" data-match-type="{{ match.match_type }}">
+          <div class="match-card">
+            <!-- Left: Match Score Circle -->
+            <div class="match-score-circle">
+              <span class="match-score-num">{{ match.score }}%</span>
+              <span class="match-score-label">MATCH</span>
+            </div>
+
+            <!-- Center: Peer Info & Match Details -->
+            <div class="match-info-center">
+              <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.4rem; flex-wrap: wrap;">
+                <h3 style="margin-bottom: 0;">
+                  <a href="{{ url_for('public_profile', username=match.user.username) }}">{{ match.user.full_name }}</a>
+                </h3>
+                <span class="badge {{ match.badge_class }}">{{ match.match_type }}</span>
+                {% if match.user.average_rating %}
+                  <span style="font-size: 0.8rem; color: #FBBF24; font-weight: 600;">★ {{ match.user.average_rating }}</span>
+                {% endif %}
+              </div>
+
+              <div style="font-size: 0.825rem; color: var(--text-dim); margin-bottom: 0.75rem;">
+                {{ match.user.department }} &bull; {{ match.user.institution }}
+              </div>
+
+              <!-- Skills Comparison -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 0.75rem; font-size: 0.85rem;">
+                <div style="background: rgba(255,255,255,0.02); padding: 0.6rem 0.85rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.05);">
+                  <div style="font-size: 0.725rem; color: var(--cyan-highlight); font-weight: 700; text-transform: uppercase;">They Can Teach You</div>
+                  <div style="color: #fff; font-weight: 500; margin-top: 0.2rem;">
+                    {% if match.learn_skill %}
+                      {{ match.learn_skill.title }} ({{ match.learn_skill.category }})
+                    {% else %}
+                      {{ match.other_teach_skills[0].title if match.other_teach_skills else 'Consult Profile' }}
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.02); padding: 0.6rem 0.85rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.05);">
+                  <div style="font-size: 0.725rem; color: var(--primary-violet); font-weight: 700; text-transform: uppercase;">You Can Teach Them</div>
+                  <div style="color: #fff; font-weight: 500; margin-top: 0.2rem;">
+                    {% if match.teach_skill %}
+                      {{ match.teach_skill.title }}
+                    {% else %}
+                      Select from your published skills
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Transparent Explanation Box -->
+              <div class="match-explanation">
+                <strong>Why this match:</strong> {{ match.explanation }}
+              </div>
+
+              <!-- Meta compatibility tags -->
+              <div style="display: flex; gap: 0.75rem; margin-top: 0.75rem; font-size: 0.775rem; color: var(--text-muted);">
+                <span>Mode: {{ match.user.preferred_mode }} {% if match.mode_match %}&#10003;{% endif %}</span>
+                <span>Language: {{ match.user.preferred_language }} {% if match.lang_match %}&#10003;{% endif %}</span>
+                <span>Availability: {{ match.user.availability_days }}</span>
+              </div>
+            </div>
+
+            <!-- Right: Actions -->
+            <div style="display: flex; flex-direction: column; gap: 0.65rem; justify-content: center;">
+              <button 
+                type="button" 
+                class="btn btn-cyan btn-sm open-propose-exchange-btn" 
+                data-recipient-id="{{ match.user.id }}" 
+                data-recipient-name="{{ match.user.full_name }}" 
+                data-learn-skill-id="{{ match.learn_skill.id if match.learn_skill else '' }}" 
+                data-teach-skill-id="{{ match.teach_skill.id if match.teach_skill else '' }}"
+              >
+                Propose Exchange
+              </button>
+              <a href="{{ url_for('public_profile', username=match.user.username) }}" class="btn btn-secondary btn-sm">
+                View Profile
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <!-- Empty State -->
+    <div class="glass-card empty-state">
+      <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="var(--cyan-highlight)" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      <h3 class="empty-title">No Peer Matches Yet</h3>
+      <p class="empty-desc">
+        To generate reciprocal matches, make sure you have:
+        1) Published skills in the Teach module, and
+        2) Specified skills you want to learn in your profile!
+      </p>
+      <div style="display: flex; gap: 1rem;">
+        <a href="{{ url_for('teach') }}" class="btn btn-cyan btn-sm">Publish Teaching Skill</a>
+        <a href="{{ url_for('edit_profile') }}" class="btn btn-secondary btn-sm">Update Learning Interests</a>
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+<!-- ==========================================
+     PROPOSE EXCHANGE MODAL FORM
+     ========================================== -->
+<div class="modal-overlay" id="propose-exchange-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 style="font-size: 1.25rem; color: #fff;">Propose Reciprocal Skill Exchange</h3>
+      <button type="button" class="modal-close-btn" aria-label="Close modal">&times;</button>
+    </div>
+
+    <!-- Partner Banner -->
+    <div style="background: rgba(0, 242, 254, 0.08); border: 1px solid var(--border-glass-bright); border-radius: var(--radius-md); padding: 0.85rem 1rem; margin-bottom: 1.25rem;">
+      <span style="font-size: 0.775rem; color: var(--cyan-highlight); font-weight: 700; text-transform: uppercase;">Exchange Partner</span>
+      <div id="exchange-recipient-name" style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-top: 0.15rem;"></div>
+    </div>
+
+    <form action="{{ url_for('propose_exchange') }}" method="POST" id="propose-exchange-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="recipient_id" id="exchange-recipient-id" value="">
+
+      <!-- 1. Skill I Will Teach -->
+      <div class="form-group">
+        <label for="exchange-teach-skill-select" class="form-label">
+          Skill I Will Teach *
+          <small>(Must be an active skill you teach)</small>
+        </label>
+        <select name="teach_skill_id" id="exchange-teach-skill-select" class="form-control" required>
+          {% if my_teach_skills %}
+            {% for s in my_teach_skills %}
+              <option value="{{ s.id }}">{{ s.title }} ({{ s.category }})</option>
+            {% endfor %}
+          {% else %}
+            <option value="" disabled selected>No published teaching skills. Please publish one first in Teach.</option>
+          {% endif %}
+        </select>
+      </div>
+
+      <!-- 2. Skill I Want to Learn (from recipient) -->
+      <div class="form-group">
+        <label for="exchange-learn-skill-select" class="form-label">
+          Skill I Want to Learn *
+          <small>(Select their published offering)</small>
+        </label>
+        <!-- We dynamically populate this or provide the preselected one from the match -->
+        <select name="learn_skill_id" id="exchange-learn-skill-select" class="form-control" required>
+          {% for match in matches %}
+            {% for s in match.other_teach_skills %}
+              <option value="{{ s.id }}">{{ s.title }} (By {{ match.user.full_name }})</option>
+            {% endfor %}
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- 3. Introduction Message -->
+      <div class="form-group">
+        <label for="exchange-message" class="form-label">Introduction & Exchange Proposal Message *</label>
+        <textarea 
+          name="message" 
+          id="exchange-message" 
+          class="form-control" 
+          rows="3" 
+          placeholder="Hi! I saw your listing and would love to exchange skills. I can help you with my expertise, and in return learn from your sessions..."
+          required
+        ></textarea>
+      </div>
+
+      <!-- 4. Schedule & Mode -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="exchange-days" class="form-label">Preferred Days</label>
+          <input type="text" name="preferred_days" id="exchange-days" class="form-control" value="Weekdays">
+        </div>
+
+        <div class="form-group">
+          <label for="exchange-time" class="form-label">Preferred Time</label>
+          <input type="text" name="preferred_time" id="exchange-time" class="form-control" value="Evenings (6:00 PM)">
+        </div>
+
+        <div class="form-group">
+          <label for="exchange-mode" class="form-label">Mode</label>
+          <select name="learning_mode" id="exchange-mode" class="form-control">
+            <option value="Online">Online</option>
+            <option value="In-Person">In-Person</option>
+            <option value="Hybrid">Hybrid</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('propose-exchange-modal')">Cancel</button>
+        <button type="submit" class="btn btn-cyan btn-sm">Send Exchange Proposal</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/skill_exchange.js') }}"></script>
+{% endblock %}

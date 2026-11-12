@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+{% block title %}Share Your Skills — SkillSwap{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Header -->
+  <div style="margin-bottom: 2.5rem; text-align: center;">
+    <div
+      style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(139, 92, 246, 0.15); border: 1px solid var(--border-glass); padding: 0.35rem 0.9rem; border-radius: var(--radius-full); margin-bottom: 1rem;">
+      <span style="color: var(--primary-violet); font-size: 0.8rem; font-weight: 600;">Peer Mentorship & Teaching</span>
+    </div>
+    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Share Your Skills</h1>
+    <p class="lead-text" style="margin: 0 auto;">Help others learn while strengthening your own knowledge.</p>
+  </div>
+
+  <div class="teach-grid">
+    <!-- Column 1: Add New Skill Form -->
+    <div class="glass-card" style="padding: 2rem;">
+      <div
+        style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 0.75rem;">
+        <div
+          style="width: 36px; height: 36px; border-radius: var(--radius-sm); background: rgba(0, 242, 254, 0.15); display: flex; align-items: center; justify-content: center; color: var(--cyan-highlight);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </div>
+        <div>
+          <h2 style="font-size: 1.25rem; color: #fff;">Publish a New Skill</h2>
+          <span style="font-size: 0.8rem; color: var(--text-dim);">Your active listings will immediately appear in the
+            Learn catalog</span>
+        </div>
+      </div>
+
+      <form action="{{ url_for('teach') }}" method="POST" id="add-skill-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+        <!-- Title -->
+        <div class="form-group">
+          <label for="title" class="form-label">Skill Title *</label>
+          <input type="text" id="title" name="title" class="form-control"
+            placeholder="e.g. Modern Full-Stack Python & Flask Architecture" required>
+        </div>
+
+        <!-- Category & Experience Level -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="category" class="form-label">Category *</label>
+            <select id="category" name="category" class="form-control" required>
+              <option value="" disabled selected>Select Category</option>
+              {% for cat in categories %}
+              <option value="{{ cat }}">{{ cat }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="experience_level" class="form-label">Experience Level *</label>
+            <select id="experience_level" name="experience_level" class="form-control">
+              <option value="Beginner">Beginner Friendly</option>
+              <option value="Intermediate" selected>Intermediate</option>
+              <option value="Advanced">Advanced</option>
+              <option value="Expert">Expert / Capstone</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="description" class="form-label">Description & Syllabus *</label>
+          <textarea id="description" name="description" class="form-control" rows="3"
+            placeholder="Explain what topics you will guide your peer through, prerequisites, and session structure..."
+            required></textarea>
+        </div>
+
+        <!-- Language, Mode, Duration -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="teaching_language" class="form-label">Teaching Language</label>
+            <input type="text" id="teaching_language" name="teaching_language" class="form-control"
+              value="{{ user.preferred_language or 'English' }}">
+          </div>
+
+          <div class="form-group">
+            <label for="learning_mode" class="form-label">Learning Mode</label>
+            <select id="learning_mode" name="learning_mode" class="form-control">
+              <option value="Online" {% if user.preferred_mode=='Online' %}selected{% endif %}>Online</option>
+              <option value="In-Person" {% if user.preferred_mode=='In-Person' %}selected{% endif %}>In-Person</option>
+              <option value="Hybrid" {% if user.preferred_mode=='Hybrid' %}selected{% endif %}>Hybrid</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="session_duration" class="form-label">Session Duration</label>
+            <select id="session_duration" name="session_duration" class="form-control">
+              <option value="30 mins">30 mins</option>
+              <option value="45-60 mins" selected>45-60 mins</option>
+              <option value="60-90 mins">60-90 mins</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Availability: Days & Time Slots -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="available_days" class="form-label">Available Days</label>
+            <input type="text" id="available_days" name="available_days" class="form-control"
+              placeholder="e.g. Mon, Wed, Fri" value="{{ user.availability_days or 'Weekdays' }}">
+          </div>
+
+          <div class="form-group">
+            <label for="available_times" class="form-label">Available Time Slots</label>
+            <input type="text" id="available_times" name="available_times" class="form-control"
+              placeholder="e.g. 6 PM - 8 PM" value="{{ user.availability_times or 'Evenings' }}">
+          </div>
+        </div>
+
+        <!-- Resources & Expected Learning Outcomes -->
+        <div class="form-group">
+          <label for="resources" class="form-label">Learning Resources Provided</label>
+          <input type="text" id="resources" name="resources" class="form-control"
+            placeholder="e.g. GitHub repos, Figma kits, cheatsheets, practice challenges">
+        </div>
+
+        <div class="form-group">
+          <label for="outcomes" class="form-label">Expected Learning Outcomes</label>
+          <input type="text" id="outcomes" name="outcomes" class="form-control"
+            placeholder="e.g. Build a portfolio web app or pass technical coding interviews">
+        </div>
+
+        <button type="submit" class="btn btn-cyan btn-lg" style="width: 100%; margin-top: 1rem;">
+          Publish Skill Listing
+        </button>
+      </form>
+    </div>
+
+    <!-- Column 2: View My Listings -->
+    <div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div>
+          <h2 style="font-size: 1.35rem; color: #fff;">My Teaching Listings</h2>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">Manage, edit, pause, or remove your published
+            skills</span>
+        </div>
+        <span class="badge badge-category">{{ my_skills|length }} Published</span>
+      </div>
+
+      {% if my_skills %}
+      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+        {% for skill in my_skills %}
+        <div class="glass-card {% if skill.status == 'paused' %}skill-card-paused{% endif %}" style="padding: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span class="badge badge-category">{{ skill.category }}</span>
+              <span class="badge badge-level">{{ skill.experience_level }}</span>
+              {% if skill.status == 'active' %}
+              <span class="badge badge-accepted">Active</span>
+              {% else %}
+              <span class="badge badge-cancelled">Paused</span>
+              {% endif %}
+            </div>
+            <span style="font-size: 0.75rem; color: var(--text-dim);">Added {{ skill.created_at.strftime('%b %d, %Y')
+              }}</span>
+          </div>
+
+          <h3 style="font-size: 1.15rem; color: #fff; margin-bottom: 0.4rem;">
+            <a href="{{ url_for('skill_details', skill_id=skill.id) }}">{{ skill.title }}</a>
+          </h3>
+
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.45; margin-bottom: 0.85rem;">
+            {{ skill.description }}
+          </p>
+
+          <div class="skill-meta-tags" style="margin-bottom: 1rem;">
+            <span class="skill-meta-item">Duration: {{ skill.session_duration }}</span>
+            <span class="skill-meta-item">Mode: {{ skill.learning_mode }}</span>
+            <span class="skill-meta-item">Days: {{ skill.available_days }}</span>
+          </div>
+
+          <!-- Action Buttons -->
+          <div
+            style="display: flex; flex-wrap: wrap; gap: 0.5rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.85rem;">
+            <!-- Edit Button -->
+            <button type="button" class="btn btn-secondary btn-sm open-edit-skill-btn" data-id="{{ skill.id }}"
+              data-title="{{ skill.title }}" data-category="{{ skill.category }}" data-desc="{{ skill.description }}"
+              data-level="{{ skill.experience_level }}" data-lang="{{ skill.teaching_language }}"
+              data-mode="{{ skill.learning_mode }}" data-duration="{{ skill.session_duration }}"
+              data-days="{{ skill.available_days }}" data-times="{{ skill.available_times }}"
+              data-resources="{{ skill.resources }}" data-outcomes="{{ skill.outcomes }}">
+              Edit Skill
+            </button>
+
+            <!-- Pause / Reactivate Button -->
+            <form action="{{ url_for('toggle_skill_status', skill_id=skill.id) }}" method="POST"
+              style="display: inline;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button type="submit" class="btn btn-secondary btn-sm">
+                {% if skill.status == 'active' %}Pause Listing{% else %}Reactivate Listing{% endif %}
+              </button>
+            </form>
+
+            <!-- Delete Button -->
+            <form action="{{ url_for('delete_skill', skill_id=skill.id) }}" method="POST" class="confirm-delete-form"
+              style="display: inline; margin-left: auto;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button type="submit" class="btn btn-danger btn-sm">
+                Delete Skill
+              </button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="glass-card empty-state">
+        <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="var(--primary-violet)" stroke-width="1.5">
+          <path d="M12 20h9"></path>
+          <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+        </svg>
+        <h3 class="empty-title">You Haven't Published Any Skills Yet</h3>
+        <p class="empty-desc">Share a skill using the form on the left to start receiving peer learning requests.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     EDIT SKILL MODAL
+     ========================================== -->
+<div class="modal-overlay" id="edit-skill-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 style="font-size: 1.25rem; color: #fff;">Edit Teaching Listing</h3>
+      <button type="button" class="modal-close-btn" aria-label="Close modal">&times;</button>
+    </div>
+
+    <form method="POST" id="edit-skill-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+      <div class="form-group">
+        <label for="edit-title" class="form-label">Skill Title *</label>
+        <input type="text" id="edit-title" name="title" class="form-control" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="edit-category" class="form-label">Category *</label>
+          <select id="edit-category" name="category" class="form-control" required>
+            {% for cat in categories %}
+            <option value="{{ cat }}">{{ cat }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-level" class="form-label">Experience Level *</label>
+          <select id="edit-level" name="experience_level" class="form-control">
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+            <option value="Expert">Expert</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="edit-description" class="form-label">Description & Syllabus *</label>
+        <textarea id="edit-description" name="description" class="form-control" rows="3" required></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="edit-language" class="form-label">Language</label>
+          <input type="text" id="edit-language" name="teaching_language" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label for="edit-mode" class="form-label">Mode</label>
+          <select id="edit-mode" name="learning_mode" class="form-control">
+            <option value="Online">Online</option>
+            <option value="In-Person">In-Person</option>
+            <option value="Hybrid">Hybrid</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-duration" class="form-label">Duration</label>
+          <input type="text" id="edit-duration" name="session_duration" class="form-control">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="edit-days" class="form-label">Available Days</label>
+          <input type="text" id="edit-days" name="available_days" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label for="edit-times" class="form-label">Available Times</label>
+          <input type="text" id="edit-times" name="available_times" class="form-control">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="edit-resources" class="form-label">Resources</label>
+        <input type="text" id="edit-resources" name="resources" class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label for="edit-outcomes" class="form-label">Outcomes</label>
+        <input type="text" id="edit-outcomes" name="outcomes" class="form-control">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('edit-skill-modal')">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/teach.js') }}"></script>
+{% endblock %}

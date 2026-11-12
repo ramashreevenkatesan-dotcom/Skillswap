@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% block title %}How SkillSwap Works — System Architecture & Workflow{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1040px;">
+  <!-- Header -->
+  <div style="text-align: center; margin-bottom: 3rem;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(0, 242, 254, 0.1); border: 1px solid var(--border-glass-bright); padding: 0.35rem 1rem; border-radius: var(--radius-full); margin-bottom: 1rem;">
+      <span style="color: var(--cyan-highlight); font-size: 0.8rem; font-weight: 600;">Peer-to-Peer Process Architecture</span>
+    </div>
+    <h1 style="font-size: 2.75rem; margin-bottom: 0.5rem; color: #fff;">How SkillSwap Works</h1>
+    <p class="lead-text" style="margin: 0 auto;">
+      A transparent 7-stage peer learning lifecycle designed for college collaboration and verified skill mastery.
+    </p>
+  </div>
+
+  <!-- Interactive Stage Navigation Pills -->
+  <div style="display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 1rem; margin-bottom: 2.5rem; justify-content: flex-start; scroll-snap-type: x mandatory;">
+    <button type="button" class="btn btn-secondary btn-sm workflow-nav-pill active" data-stage="1">1. Registration</button>
+    <button type="button" class="btn btn-secondary btn-sm workflow-nav-pill" data-stage="2">2. Profile Setup</button>
+    <button type="button" class="btn btn-secondary btn-sm workflow-nav-pill" data-stage="3">3. Discovery</button>
+    <button type="button" class="btn btn-secondary btn-sm workflow-nav-pill" data-stage="4">4. Skill Matching</button>
+    <button type="button" class="btn btn-secondary btn-sm workflow-nav-pill" data-stage="5">5. Requests</button>
+    <button type="button" class="btn btn-secondary btn-sm workflow-nav-pill" data-stage="6">6. Learning Sessions</button>
+    <button type="button" class="btn btn-secondary btn-sm workflow-nav-pill" data-stage="7">7. Feedback</button>
+  </div>
+
+  <!-- Visual Workflow Stages Timeline -->
+  <div class="workflow-stages">
+
+    <!-- Stage 1: Account Creation -->
+    <div class="workflow-stage workflow-stage-card" id="stage-1">
+      <div class="workflow-node">01</div>
+      <div class="glass-card" style="padding: 2rem;">
+        <span class="badge badge-category" style="margin-bottom: 0.5rem;">Stage 1 &bull; Identity & Security</span>
+        <h2 style="font-size: 1.5rem; color: #fff; margin-bottom: 0.5rem;">Account Creation & Authentication</h2>
+        <p style="color: var(--text-muted); font-size: 0.925rem; line-height: 1.6; margin-bottom: 1rem;">
+          Students securely establish an academic identity with campus credentials, strong password hashing, and session authentication.
+        </p>
+
+        <div class="workflow-step-list">
+          <div class="workflow-step-item">
+            <span style="color: var(--cyan-highlight); font-weight: 700;">1.</span> Open SkillSwap Portal
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--cyan-highlight); font-weight: 700;">2.</span> Enter Student Details
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--cyan-highlight); font-weight: 700;">3.</span> Server-side Regex Validation
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--cyan-highlight); font-weight: 700;">4.</span> Cryptographic Password Hash
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--cyan-highlight); font-weight: 700;">5.</span> Persist User in SQLite DB
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--cyan-highlight); font-weight: 700;">6.</span> Secure Session Login
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 2: Profile Setup -->
+    <div class="workflow-stage workflow-stage-card" id="stage-2">
+      <div class="workflow-node" style="background: linear-gradient(135deg, var(--cyan-highlight), var(--electric-blue)); color: var(--bg-darkest);">02</div>
+      <div class="glass-card" style="padding: 2rem;">
+        <span class="badge badge-level" style="margin-bottom: 0.5rem;">Stage 2 &bull; Educational Preferences</span>
+        <h2 style="font-size: 1.5rem; color: #fff; margin-bottom: 0.5rem;">Profile Setup & Curriculum Wishlist</h2>
+        <p style="color: var(--text-muted); font-size: 0.925rem; line-height: 1.6; margin-bottom: 1rem;">
+          Define university major, learning interests, teaching readiness, availability slots, and mode preferences (Online, In-Person, or Hybrid).
+        </p>
+
+        <div class="workflow-step-list">
+          <div class="workflow-step-item">
+            <span style="color: var(--primary-violet); font-weight: 700;">1.</span> Add Institution & Major
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--primary-violet); font-weight: 700;">2.</span> Select Learning Wishlist
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--primary-violet); font-weight: 700;">3.</span> Publish Teaching Syllabus
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--primary-violet); font-weight: 700;">4.</span> Set Availability Windows
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--primary-violet); font-weight: 700;">5.</span> Select Language & Mode
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--primary-violet); font-weight: 700;">6.</span> Save to SQLite Profile
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 3: Skill Discovery -->
+    <div class="workflow-stage workflow-stage-card" id="stage-3">
+      <div class="workflow-node">03</div>
+      <div class="glass-card" style="padding: 2rem;">
+        <span class="badge badge-accepted" style="margin-bottom: 0.5rem;">Stage 3 &bull; Catalog Exploration</span>
+        <h2 style="font-size: 1.5rem; color: #fff; margin-bottom: 0.5rem;">Skill Discovery & Filtering</h2>
+        <p style="color: var(--text-muted); font-size: 0.925rem; line-height: 1.6; margin-bottom: 1rem;">
+          Students browse the live peer teaching catalog. Advanced multi-parameter filters enable finding mentors by programming language, UX tools, or experience levels.
+        </p>
+
+        <div class="workflow-step-list">
+          <div class="workflow-step-item">
+            <span style="color: var(--cyan-highlight); font-weight: 700;">1.</span> Open Learn Catalog
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--cyan-highlight); font-weight: 700;">2.</span> Real-time Keyword Search
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--cyan-highlight); font-weight: 700;">3.</span> Category & Level Filters
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--cyan-highlight); font-weight: 700;">4.</span> Inspect Syllabus & Outcomes
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--cyan-highlight); font-weight: 700;">5.</span> View Verified Peer Ratings
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--cyan-highlight); font-weight: 700;">6.</span> Send Learning Request
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 4: Skill Matching -->
+    <div class="workflow-stage workflow-stage-card" id="stage-4">
+      <div class="workflow-node" style="background: linear-gradient(135deg, var(--primary-purple), var(--cyan-highlight));">04</div>
+      <div class="glass-card" style="padding: 2rem; border: 1px solid var(--border-glass-bright);">
+        <span class="badge badge-reciprocal" style="margin-bottom: 0.5rem;">Stage 4 &bull; Reciprocal Synergy Engine</span>
+        <h2 style="font-size: 1.5rem; color: #fff; margin-bottom: 0.5rem;">Rule-Based Bilateral Skill Matching</h2>
+        <p style="color: var(--text-muted); font-size: 0.925rem; line-height: 1.6; margin-bottom: 1rem;">
+          Our deterministic matching algorithm cross-references user catalogs. When User A teaches what User B wants and User B teaches what User A wants, a Strong Reciprocal Match is formed with clear explanations.
+        </p>
+
+        <div class="workflow-step-list">
+          <div class="workflow-step-item">
+            <span style="color: var(--cyan-highlight); font-weight: 700;">1.</span> Retrieve Active Teaching Skills
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--cyan-highlight); font-weight: 700;">2.</span> Retrieve Learning Interests
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--cyan-highlight); font-weight: 700;">3.</span> Compare Complementary Matrix
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--cyan-highlight); font-weight: 700;">4.</span> Calculate Compatibility Score
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--cyan-highlight); font-weight: 700;">5.</span> Display Transparent Rationale
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--cyan-highlight); font-weight: 700;">6.</span> Propose Reciprocal Exchange
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 5: Request Management -->
+    <div class="workflow-stage workflow-stage-card" id="stage-5">
+      <div class="workflow-node">05</div>
+      <div class="glass-card" style="padding: 2rem;">
+        <span class="badge badge-pending" style="margin-bottom: 0.5rem;">Stage 5 &bull; Finite State Machine</span>
+        <h2 style="font-size: 1.5rem; color: #fff; margin-bottom: 0.5rem;">Request Lifecycle & Authorization</h2>
+        <p style="color: var(--text-muted); font-size: 0.925rem; line-height: 1.6; margin-bottom: 1rem;">
+          State transitions (Pending &rarr; Accepted / Rejected / Cancelled &rarr; Completed) are enforced with strict authorization checks. Only recipient can accept; only sender can cancel pending proposals.
+        </p>
+
+        <div class="workflow-step-list">
+          <div class="workflow-step-item">
+            <span style="color: var(--status-pending); font-weight: 700;">1.</span> Proposal Logged as Pending
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--status-pending); font-weight: 700;">2.</span> Recipient Notified on Dashboard
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--status-pending); font-weight: 700;">3.</span> Recipient Accepts or Rejects
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--status-pending); font-weight: 700;">4.</span> Atomic SQLite DB Update
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--status-pending); font-weight: 700;">5.</span> Exchange Becomes Active
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--status-pending); font-weight: 700;">6.</span> Sessions Unlocked
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 6: Learning Exchange -->
+    <div class="workflow-stage workflow-stage-card" id="stage-6">
+      <div class="workflow-node" style="background: linear-gradient(135deg, var(--status-accepted), var(--cyan-highlight)); color: var(--bg-darkest);">06</div>
+      <div class="glass-card" style="padding: 2rem;">
+        <span class="badge badge-accepted" style="margin-bottom: 0.5rem;">Stage 6 &bull; Peer Coordination</span>
+        <h2 style="font-size: 1.5rem; color: #fff; margin-bottom: 0.5rem;">Session Scheduling & Execution</h2>
+        <p style="color: var(--text-muted); font-size: 0.925rem; line-height: 1.6; margin-bottom: 1rem;">
+          Accepted peers use the built-in session scheduler to coordinate video meeting links, campus room reservations, and preparation agendas.
+        </p>
+
+        <div class="workflow-step-list">
+          <div class="workflow-step-item">
+            <span style="color: var(--status-accepted); font-weight: 700;">1.</span> Open Session Scheduler
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--status-accepted); font-weight: 700;">2.</span> Set Date, Time, Duration
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--status-accepted); font-weight: 700;">3.</span> Attach Video / Room Link
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--status-accepted); font-weight: 700;">4.</span> Peer Session Conducted
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--status-accepted); font-weight: 700;">5.</span> Code & Concepts Exchanged
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: var(--status-accepted); font-weight: 700;">6.</span> Exchange Marked Completed
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 7: Feedback -->
+    <div class="workflow-stage workflow-stage-card" id="stage-7">
+      <div class="workflow-node" style="background: radial-gradient(circle, #FBBF24, #B45309); color: #fff;">07</div>
+      <div class="glass-card" style="padding: 2rem; border-left: 4px solid #FBBF24;">
+        <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: #FBBF24; margin-bottom: 0.5rem;">Stage 7 &bull; Quality Assurance</span>
+        <h2 style="font-size: 1.5rem; color: #fff; margin-bottom: 0.5rem;">Peer Rating & Reputation Building</h2>
+        <p style="color: var(--text-muted); font-size: 0.925rem; line-height: 1.6; margin-bottom: 1rem;">
+          To eliminate fraudulent or fake reviews, reviews are unlocked ONLY after an exchange reaches the Completed state. Ratings directly compute the teacher's profile trust score.
+        </p>
+
+        <div class="workflow-step-list">
+          <div class="workflow-step-item">
+            <span style="color: #FBBF24; font-weight: 700;">1.</span> Completed State Validated
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: #FBBF24; font-weight: 700;">2.</span> Star Rating Selected (1-5)
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: #FBBF24; font-weight: 700;">3.</span> Detailed Peer Comment
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: #FBBF24; font-weight: 700;">4.</span> Atomic Review Persistence
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: #FBBF24; font-weight: 700;">5.</span> Recalculate Average Rating
+          </div>
+          <div class="workflow-step-item">
+            <span style="color: #FBBF24; font-weight: 700;">6.</span> Display on Public Profile
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/workflow.js') }}"></script>
+{% endblock %}

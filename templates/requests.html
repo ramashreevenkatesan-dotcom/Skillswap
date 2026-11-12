@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+
+{% block title %}My Requests — SkillSwap{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Header -->
+  <div style="margin-bottom: 2rem;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(59, 130, 246, 0.15); border: 1px solid var(--border-glass); padding: 0.35rem 0.9rem; border-radius: var(--radius-full); margin-bottom: 0.75rem;">
+      <span style="color: var(--electric-blue); font-size: 0.8rem; font-weight: 600;">Request Management</span>
+    </div>
+    <h1 style="font-size: 2.25rem; margin-bottom: 0.35rem; color: #fff;">My Requests</h1>
+    <p class="lead-text">Track your learning requests and manage your skill exchanges.</p>
+  </div>
+
+  <!-- Navigation Tabs with Real DB Counts -->
+  <div class="tabs-nav">
+    <a href="{{ url_for('requests_page', tab='all') }}" class="tab-btn {% if current_tab == 'all' %}active{% endif %}">
+      All <span class="tab-count">{{ counts.all }}</span>
+    </a>
+    <a href="{{ url_for('requests_page', tab='received') }}" class="tab-btn {% if current_tab == 'received' %}active{% endif %}">
+      Received <span class="tab-count">{{ counts.received }}</span>
+    </a>
+    <a href="{{ url_for('requests_page', tab='sent') }}" class="tab-btn {% if current_tab == 'sent' %}active{% endif %}">
+      Sent <span class="tab-count">{{ counts.sent }}</span>
+    </a>
+    <a href="{{ url_for('requests_page', tab='learning') }}" class="tab-btn {% if current_tab == 'learning' %}active{% endif %}">
+      Learning Requests
+    </a>
+    <a href="{{ url_for('requests_page', tab='exchanges') }}" class="tab-btn {% if current_tab == 'exchanges' %}active{% endif %}">
+      Skill Exchange Proposals
+    </a>
+    <a href="{{ url_for('requests_page', tab='pending') }}" class="tab-btn {% if current_tab == 'pending' %}active{% endif %}">
+      Pending <span class="tab-count" style="color: var(--status-pending);">{{ counts.pending }}</span>
+    </a>
+    <a href="{{ url_for('requests_page', tab='accepted') }}" class="tab-btn {% if current_tab == 'accepted' %}active{% endif %}">
+      Accepted <span class="tab-count" style="color: var(--status-accepted);">{{ counts.accepted }}</span>
+    </a>
+    <a href="{{ url_for('requests_page', tab='completed') }}" class="tab-btn {% if current_tab == 'completed' %}active{% endif %}">
+      Completed <span class="tab-count" style="color: var(--cyan-highlight);">{{ counts.completed }}</span>
+    </a>
+    <a href="{{ url_for('requests_page', tab='rejected') }}" class="tab-btn {% if current_tab == 'rejected' %}active{% endif %}">
+      Rejected <span class="tab-count">{{ counts.rejected }}</span>
+    </a>
+  </div>
+
+  <!-- Requests List -->
+  {% if requests %}
+    <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+      {% for req in requests %}
+        <div class="glass-card glass-card-hover" style="padding: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.85rem;">
+            <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
+              <span class="badge badge-{{ req.status }}">{{ req.status }}</span>
+              <span class="badge badge-category" style="text-transform: uppercase;">
+                {{ req.request_type }}
+              </span>
+              <span style="font-size: 0.8rem; color: var(--text-dim); font-weight: 600;">
+                #REQ-{{ req.id }}
+              </span>
+            </div>
+            <span style="font-size: 0.8rem; color: var(--text-dim);">
+              {{ req.created_at.strftime('%b %d, %Y at %I:%M %p') }}
+            </span>
+          </div>
+
+          <!-- Participants & Skills -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+            <!-- Sender -->
+            <div style="background: rgba(255,255,255,0.02); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.05);">
+              <div style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Sender</div>
+              <div style="font-weight: 600; color: #fff; margin-top: 0.2rem;">
+                {{ req.sender.full_name }} {% if req.sender_id == current_user.id %}<span style="color: var(--cyan-highlight); font-size: 0.75rem;">(You)</span>{% endif %}
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">{{ req.sender.institution }}</div>
+            </div>
+
+            <!-- Recipient -->
+            <div style="background: rgba(255,255,255,0.02); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.05);">
+              <div style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700;">Recipient</div>
+              <div style="font-weight: 600; color: #fff; margin-top: 0.2rem;">
+                {{ req.recipient.full_name }} {% if req.recipient_id == current_user.id %}<span style="color: var(--cyan-highlight); font-size: 0.75rem;">(You)</span>{% endif %}
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text-muted);">{{ req.recipient.institution }}</div>
+            </div>
+
+            <!-- Skill Details -->
+            <div style="background: rgba(255,255,255,0.02); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.05);">
+              <div style="font-size: 0.7rem; color: var(--cyan-highlight); text-transform: uppercase; font-weight: 700;">Skill Requested</div>
+              <div style="font-weight: 600; color: #fff; margin-top: 0.2rem;">
+                {{ req.learn_skill.title if req.learn_skill else 'Skill Session' }}
+              </div>
+              {% if req.teach_skill %}
+                <div style="font-size: 0.75rem; color: var(--primary-violet); margin-top: 0.2rem;">
+                  Offered in exchange: {{ req.teach_skill.title }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Message -->
+          <div style="background: rgba(10, 14, 26, 0.6); padding: 0.85rem 1rem; border-radius: var(--radius-sm); border-left: 3px solid var(--border-glass-bright); font-size: 0.875rem; color: var(--text-light); margin-bottom: 1rem; line-height: 1.5;">
+            "{{ req.message }}"
+          </div>
+
+          <!-- Schedule Meta -->
+          <div style="display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+            <span>Mode: <strong style="color: #fff;">{{ req.learning_mode }}</strong></span>
+            <span>Days: <strong style="color: #fff;">{{ req.preferred_days }}</strong></span>
+            <span>Time: <strong style="color: #fff;">{{ req.preferred_time }}</strong></span>
+          </div>
+
+          <!-- Action Buttons Based on Status & Authorization -->
+          <div style="display: flex; flex-wrap: wrap; gap: 0.65rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1rem; align-items: center;">
+            <a href="{{ url_for('request_details', request_id=req.id) }}" class="btn btn-secondary btn-sm">
+              View Request Details &rarr;
+            </a>
+
+            <!-- Case 1: Received & Pending (Recipient can Accept or Reject) -->
+            {% if req.recipient_id == current_user.id and req.status == 'pending' %}
+              <form action="{{ url_for('update_request_status', request_id=req.id) }}" method="POST" class="status-action-form" data-action-label="accept this learning request" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="status" value="accepted">
+                <button type="submit" class="btn btn-success btn-sm">Accept Request</button>
+              </form>
+
+              <form action="{{ url_for('update_request_status', request_id=req.id) }}" method="POST" class="status-action-form" data-action-label="reject this request" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="status" value="rejected">
+                <button type="submit" class="btn btn-danger btn-sm">Reject Request</button>
+              </form>
+            {% endif %}
+
+            <!-- Case 2: Sent & Pending (Sender can Cancel) -->
+            {% if req.sender_id == current_user.id and req.status == 'pending' %}
+              <form action="{{ url_for('update_request_status', request_id=req.id) }}" method="POST" class="status-action-form" data-action-label="cancel your pending request" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="status" value="cancelled">
+                <button type="submit" class="btn btn-danger btn-sm">Cancel Request</button>
+              </form>
+            {% endif %}
+
+            <!-- Case 3: Accepted (Participants can Arrange Session or Mark Complete) -->
+            {% if req.status == 'accepted' %}
+              <button 
+                type="button" 
+                class="btn btn-cyan btn-sm open-schedule-modal-btn" 
+                data-request-id="{{ req.id }}"
+              >
+                Arrange Session
+              </button>
+
+              <form action="{{ url_for('update_request_status', request_id=req.id) }}" method="POST" class="status-action-form" data-action-label="mark this exchange as completed" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="status" value="completed">
+                <button type="submit" class="btn btn-primary btn-sm">Mark as Completed</button>
+              </form>
+            {% endif %}
+
+            <!-- Case 4: Completed (Leave Review) -->
+            {% if req.status == 'completed' %}
+              {% set other_user = req.recipient if req.sender_id == current_user.id else req.sender %}
+              <button 
+                type="button" 
+                class="btn btn-cyan btn-sm open-review-modal-btn" 
+                data-request-id="{{ req.id }}" 
+                data-partner-name="{{ other_user.full_name }}"
+              >
+                Submit Peer Review
+              </button>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <!-- Empty State -->
+    <div class="glass-card empty-state">
+      <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="var(--cyan-highlight)" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+      <h3 class="empty-title">No Requests in this Tab</h3>
+      <p class="empty-desc">You do not have any requests matching "{{ current_tab }}". Explore skills to request a session or propose an exchange!</p>
+      <div style="display: flex; gap: 1rem;">
+        <a href="{{ url_for('learn') }}" class="btn btn-cyan btn-sm">Explore Skills</a>
+        <a href="{{ url_for('skill_exchange') }}" class="btn btn-secondary btn-sm">Find Exchange Partner</a>
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+<!-- ==========================================
+     SCHEDULE SESSION MODAL
+     ========================================== -->
+<div class="modal-overlay" id="schedule-session-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 style="font-size: 1.25rem; color: #fff;">Arrange Learning Session</h3>
+      <button type="button" class="modal-close-btn" aria-label="Close modal">&times;</button>
+    </div>
+
+    <form method="POST" id="schedule-session-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="request_id" id="session-request-id" value="">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="sched-date" class="form-label">Scheduled Date *</label>
+          <input type="date" id="sched-date" name="scheduled_date" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label for="sched-time" class="form-label">Scheduled Time *</label>
+          <input type="time" id="sched-time" name="scheduled_time" class="form-control" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="sched-duration" class="form-label">Duration</label>
+          <select id="sched-duration" name="duration" class="form-control">
+            <option value="30 mins">30 mins</option>
+            <option value="45 mins">45 mins</option>
+            <option value="60 mins" selected>60 mins</option>
+            <option value="90 mins">90 mins</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="sched-mode" class="form-label">Meeting Mode</label>
+          <select id="sched-mode" name="meeting_mode" class="form-control">
+            <option value="Online (Google Meet / Zoom)">Online (Video Call)</option>
+            <option value="In-Person (Campus Library / Lab)">In-Person (Campus)</option>
+            <option value="Discord / Audio Call">Discord / Audio Call</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="sched-link" class="form-label">Meeting Link or Campus Room Location</label>
+        <input 
+          type="text" 
+          id="sched-link" 
+          name="meeting_link" 
+          class="form-control" 
+          placeholder="e.g. https://meet.jit.si/skillswap-peer or Library Room 3B" 
+          value="https://meet.jit.si/skillswap-peer"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="sched-notes" class="form-label">Session Agenda & Prep Notes</label>
+        <textarea 
+          id="sched-notes" 
+          name="notes" 
+          class="form-control" 
+          rows="2" 
+          placeholder="Topics to cover, starter repos, setup requirements..."
+        ></textarea>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('schedule-session-modal')">Cancel</button>
+        <button type="submit" class="btn btn-cyan btn-sm">Confirm Session</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ==========================================
+     SUBMIT REVIEW MODAL
+     ========================================== -->
+<div class="modal-overlay" id="submit-review-modal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 style="font-size: 1.25rem; color: #fff;">Peer Review & Feedback</h3>
+      <button type="button" class="modal-close-btn" aria-label="Close modal">&times;</button>
+    </div>
+
+    <div style="margin-bottom: 1.25rem; font-size: 0.9rem; color: var(--text-light);">
+      Provide genuine feedback for <strong id="review-partner-name" style="color: var(--cyan-highlight);"></strong> for this completed exchange.
+    </div>
+
+    <form method="POST" id="submit-review-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="rating" id="rating-score-input" value="5">
+
+      <div class="form-group" style="text-align: center; margin-bottom: 1.5rem;">
+        <label class="form-label" style="justify-content: center; margin-bottom: 0.75rem;">Your Rating (1 to 5 Stars) *</label>
+        <div id="star-rating-selector" style="display: flex; justify-content: center; gap: 0.75rem; font-size: 2.25rem; cursor: pointer;">
+          <span class="star-icon" data-val="1" style="color: #FBBF24;">★</span>
+          <span class="star-icon" data-val="2" style="color: #FBBF24;">★</span>
+          <span class="star-icon" data-val="3" style="color: #FBBF24;">★</span>
+          <span class="star-icon" data-val="4" style="color: #FBBF24;">★</span>
+          <span class="star-icon" data-val="5" style="color: #FBBF24;">★</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="review-comment" class="form-label">Review Comment *</label>
+        <textarea 
+          id="review-comment" 
+          name="comment" 
+          class="form-control" 
+          rows="4" 
+          placeholder="How was the session? Did your peer explain concepts clearly? Was the exchange mutually beneficial?" 
+          required
+        ></textarea>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('submit-review-modal')">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Submit Review</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/requests.js') }}"></script>
+{% endblock %}

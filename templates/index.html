@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}SkillSwap — Your Skills. Their Knowledge. Everyone Grows.{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Hero Section -->
+  <section class="hero-section" style="padding: 3.5rem 0 4rem; text-align: center; position: relative;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(112, 0, 255, 0.15); border: 1px solid var(--border-glass-bright); padding: 0.4rem 1rem; border-radius: var(--radius-full); margin-bottom: 1.5rem;">
+      <span style="color: var(--cyan-highlight); font-size: 0.85rem; font-weight: 600;">Peer-to-Peer Academic & Skill Exchange</span>
+    </div>
+
+    <h1 style="font-size: clamp(2.25rem, 5vw, 3.75rem); line-height: 1.15; max-width: 900px; margin: 0 auto 1.25rem;">
+      Your Skills. <span class="text-gradient">Their Knowledge.</span> <span class="text-gradient-purple">Everyone Grows.</span>
+    </h1>
+
+    <p class="lead-text" style="margin: 0 auto 2.25rem; font-size: clamp(1rem, 2vw, 1.25rem); color: var(--text-light);">
+      Learn something new, teach what you know, and exchange skills with people who share your passion for learning.
+    </p>
+
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-bottom: 3.5rem;">
+      <a href="{{ url_for('signup') }}" class="btn btn-cyan btn-lg" id="hero-get-started-btn">Get Started</a>
+      <a href="{{ url_for('learn') }}" class="btn btn-primary btn-lg" id="hero-explore-skills-btn">Explore Skills</a>
+      <a href="{{ url_for('workflow') }}" class="btn btn-secondary btn-lg" id="hero-how-it-works-btn">How It Works</a>
+    </div>
+
+    <!-- Live Platform Highlights (Real Database Active Catalog preview) -->
+    <div class="glass-card" style="padding: 1.5rem; max-width: 960px; margin: 0 auto; text-align: left;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <h2 style="font-size: 1.15rem; margin-bottom: 0.2rem;">Live Skill Offerings on Campus</h2>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">Real skills published by student peers across departments</span>
+        </div>
+        <a href="{{ url_for('learn') }}" class="btn btn-secondary btn-sm">View All Catalog &rarr;</a>
+      </div>
+
+      <div class="skills-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+        {% for skill in featured_skills %}
+          <div class="glass-card glass-card-hover" style="padding: 1.25rem; background: rgba(10, 14, 26, 0.7);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+              <span class="badge badge-category">{{ skill.category }}</span>
+              <span class="badge badge-level">{{ skill.experience_level }}</span>
+            </div>
+            <h3 style="font-size: 1rem; margin-bottom: 0.4rem; color: #fff;">{{ skill.title }}</h3>
+            <p style="font-size: 0.825rem; color: var(--text-muted); margin-bottom: 0.85rem; line-height: 1.4;">
+              {{ skill.description[:110] }}...
+            </p>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.65rem;">
+              <span style="font-size: 0.8rem; color: var(--text-dim);">By {{ skill.teacher.full_name }}</span>
+              <a href="{{ url_for('skill_details', skill_id=skill.id) }}" class="btn btn-secondary btn-sm" style="padding: 0.25rem 0.6rem; font-size: 0.775rem;">View</a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- How SkillSwap Works Section -->
+  <section style="padding: 4rem 0;" id="how-it-works">
+    <div style="text-align: center; margin-bottom: 3rem;">
+      <h2 style="font-size: 2.25rem; margin-bottom: 0.75rem;">How SkillSwap Works</h2>
+      <p class="lead-text" style="margin: 0 auto;">A transparent, collaborative reciprocal exchange mechanism built for students.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.75rem;">
+      <!-- Step 1: Learn -->
+      <div class="glass-card glass-card-hover">
+        <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: rgba(0, 242, 254, 0.15); border: 1px solid var(--border-glass-bright); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: var(--cyan-highlight); margin-bottom: 1.25rem;">
+          01
+        </div>
+        <h3 style="font-size: 1.35rem; margin-bottom: 0.65rem;">1. Discover & Learn</h3>
+        <p style="color: var(--text-muted); font-size: 0.925rem; line-height: 1.6;">
+          Browse real course skills published by peer tutors across multiple domains. Filter by category, learning mode, and experience level, then request a 1-on-1 session.
+        </p>
+      </div>
+
+      <!-- Step 2: Teach -->
+      <div class="glass-card glass-card-hover">
+        <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: rgba(139, 92, 246, 0.15); border: 1px solid var(--border-glass); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: var(--primary-violet); margin-bottom: 1.25rem;">
+          02
+        </div>
+        <h3 style="font-size: 1.35rem; margin-bottom: 0.65rem;">2. Share & Teach</h3>
+        <p style="color: var(--text-muted); font-size: 0.925rem; line-height: 1.6;">
+          List skills you are proficient in. Define your preferred days, times, duration, and target outcomes. Help classmates while reinforcing your own mastery.
+        </p>
+      </div>
+
+      <!-- Step 3: Exchange -->
+      <div class="glass-card glass-card-hover">
+        <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: rgba(59, 130, 246, 0.15); border: 1px solid var(--border-glass); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: var(--electric-blue); margin-bottom: 1.25rem;">
+          03
+        </div>
+        <h3 style="font-size: 1.35rem; margin-bottom: 0.65rem;">3. Reciprocal Skill Exchange</h3>
+        <p style="color: var(--text-muted); font-size: 0.925rem; line-height: 1.6;">
+          Our rule-based matching algorithm connects you with peers who teach what you want to learn and simultaneously want to learn what you teach. Win-win collaboration!
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Pillars: Learn, Teach, Exchange -->
+  <section style="padding: 3rem 0;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
+      <div class="glass-card" style="border-left: 4px solid var(--cyan-highlight);">
+        <h3 style="font-size: 1.3rem; margin-bottom: 0.75rem; color: var(--cyan-highlight);">Learn Without Paywalls</h3>
+        <p style="color: var(--text-light); font-size: 0.925rem; line-height: 1.6; margin-bottom: 1rem;">
+          College students often encounter expensive bootcamps and locked courses. On SkillSwap, learning is unlocked by reciprocal knowledge sharing.
+        </p>
+        <a href="{{ url_for('learn') }}" class="btn btn-secondary btn-sm">Explore Courses &rarr;</a>
+      </div>
+
+      <div class="glass-card" style="border-left: 4px solid var(--primary-violet);">
+        <h3 style="font-size: 1.3rem; margin-bottom: 0.75rem; color: var(--primary-violet);">Strengthen Through Teaching</h3>
+        <p style="color: var(--text-light); font-size: 0.925rem; line-height: 1.6; margin-bottom: 1rem;">
+          The best way to understand a subject deeply is to explain it to someone else. Build teaching experience, leadership credentials, and peer reviews.
+        </p>
+        <a href="{{ url_for('signup') }}" class="btn btn-secondary btn-sm">Publish Your Skills &rarr;</a>
+      </div>
+
+      <div class="glass-card" style="border-left: 4px solid var(--electric-blue);">
+        <h3 style="font-size: 1.3rem; margin-bottom: 0.75rem; color: var(--electric-blue);">Smart Reciprocal Matching</h3>
+        <p style="color: var(--text-light); font-size: 0.925rem; line-height: 1.6; margin-bottom: 1rem;">
+          Transparent algorithms calculate exact bilateral compatibility between your teaching catalog and learning wishlist, ensuring natural synergy.
+        </p>
+        <a href="{{ url_for('workflow') }}" class="btn btn-secondary btn-sm">See Matching System &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits for Students Section -->
+  <section style="padding: 4rem 0;">
+    <div style="text-align: center; margin-bottom: 3rem;">
+      <h2 style="font-size: 2.25rem; margin-bottom: 0.75rem;">Benefits for Students</h2>
+      <p class="lead-text" style="margin: 0 auto;">Designed specifically around the academic and career challenges faced by university students.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
+      <div class="glass-card">
+        <h4 style="color: #fff; margin-bottom: 0.5rem; font-size: 1.1rem;">Zero Monetary Cost</h4>
+        <p style="color: var(--text-muted); font-size: 0.875rem; line-height: 1.5;">Exchange skills directly without costly subscriptions, hourly tutor rates, or platform transaction fees.</p>
+      </div>
+
+      <div class="glass-card">
+        <h4 style="color: #fff; margin-bottom: 0.5rem; font-size: 1.1rem;">Cross-Disciplinary Learning</h4>
+        <p style="color: var(--text-muted); font-size: 0.875rem; line-height: 1.5;">Connect with students from Computer Science, Design, Business, and Humanities to broaden your skillset.</p>
+      </div>
+
+      <div class="glass-card">
+        <h4 style="color: #fff; margin-bottom: 0.5rem; font-size: 1.1rem;">Genuine Peer Reviews</h4>
+        <p style="color: var(--text-muted); font-size: 0.875rem; line-height: 1.5;">Build a verified campus reputation with honest peer feedback received exclusively from completed exchanges.</p>
+      </div>
+
+      <div class="glass-card">
+        <h4 style="color: #fff; margin-bottom: 0.5rem; font-size: 1.1rem;">Flexible Study Schedules</h4>
+        <p style="color: var(--text-muted); font-size: 0.875rem; line-height: 1.5;">Coordinate online or in-person sessions around exams, lab commitments, and weekend study windows.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Frequently Asked Questions (FAQ) -->
+  <section style="padding: 3rem 0 5rem;" id="faq">
+    <div style="text-align: center; margin-bottom: 2.5rem;">
+      <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Frequently Asked Questions</h2>
+      <p class="lead-text" style="margin: 0 auto;">Everything you need to know about getting started on SkillSwap.</p>
+    </div>
+
+    <div class="glass-card" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem;">
+      <div>
+        <h4 style="color: var(--cyan-highlight); margin-bottom: 0.35rem;">What is a "Reciprocal Skill Exchange"?</h4>
+        <p style="color: var(--text-light); font-size: 0.925rem; line-height: 1.6;">
+          A reciprocal skill exchange occurs when two students have complementary skills: Student A teaches a skill Student B desires (e.g., Python Backend), and Student B teaches a skill Student A desires (e.g., Figma UI Design). Both exchange knowledge equally!
+        </p>
+      </div>
+
+      <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1.25rem;">
+        <h4 style="color: var(--cyan-highlight); margin-bottom: 0.35rem;">Can I request a skill even if I don't have a reciprocal match yet?</h4>
+        <p style="color: var(--text-light); font-size: 0.925rem; line-height: 1.6;">
+          Yes! You can send a direct "Request to Learn" for any active skill listing. The teacher will review your learning goals and can accept your session request directly.
+        </p>
+      </div>
+
+      <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1.25rem;">
+        <h4 style="color: var(--cyan-highlight); margin-bottom: 0.35rem;">How are learning sessions conducted?</h4>
+        <p style="color: var(--text-light); font-size: 0.925rem; line-height: 1.6;">
+          Once an exchange or learning request is accepted, both participants can arrange sessions using the built-in scheduler, complete with video call links (e.g., Google Meet / Zoom) or campus meetups.
+        </p>
+      </div>
+
+      <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1.25rem;">
+        <h4 style="color: var(--cyan-highlight); margin-bottom: 0.35rem;">How does peer rating and feedback work?</h4>
+        <p style="color: var(--text-light); font-size: 0.925rem; line-height: 1.6;">
+          To ensure genuine quality and eliminate fake ratings, reviews are only unlocked once both participants mark an exchange as Completed. Ratings reflect real student peer experiences.
+        </p>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}

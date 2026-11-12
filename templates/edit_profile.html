@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile — SkillSwap{% endblock %}
+
+{% block content %}
+<div class="container container-narrow" style="padding: 2rem 1rem;">
+  <div class="glass-card" style="padding: 2.5rem;">
+    <!-- Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 1rem;">
+      <div>
+        <h1 style="font-size: 1.85rem; color: #fff; margin-bottom: 0.25rem;">Edit Student Profile</h1>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Keep your academic details and learning wishlist up to date</p>
+      </div>
+      <a href="{{ url_for('profile') }}" class="btn btn-secondary btn-sm">&larr; Back to Profile</a>
+    </div>
+
+    <form action="{{ url_for('edit_profile') }}" method="POST" id="edit-profile-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+      <!-- Basic Identity -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="edit_full_name" class="form-label">Full Name *</label>
+          <input 
+            type="text" 
+            id="edit_full_name" 
+            name="full_name" 
+            class="form-control" 
+            value="{{ user.full_name }}" 
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Username (Read-Only)</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            value="{{ user.username }}" 
+            disabled 
+            style="opacity: 0.6; cursor: not-allowed;"
+          >
+        </div>
+      </div>
+
+      <!-- Academic Background -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="edit_institution" class="form-label">College / Institution</label>
+          <input 
+            type="text" 
+            id="edit_institution" 
+            name="institution" 
+            class="form-control" 
+            value="{{ user.institution }}"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="edit_department" class="form-label">Department / Major</label>
+          <input 
+            type="text" 
+            id="edit_department" 
+            name="department" 
+            class="form-control" 
+            value="{{ user.department }}"
+          >
+        </div>
+      </div>
+
+      <!-- Biography -->
+      <div class="form-group">
+        <label for="edit_biography" class="form-label">Biography</label>
+        <textarea 
+          id="edit_biography" 
+          name="biography" 
+          class="form-control" 
+          rows="3"
+        >{{ user.biography }}</textarea>
+      </div>
+
+      <!-- Learning Interests (Interactive Tags) -->
+      <div class="form-group">
+        <label for="interest-tag-input" class="form-label">
+          Skills I Want to Learn (Learning Wishlist)
+          <small>Type and press Enter or click Add</small>
+        </label>
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <input 
+            type="text" 
+            id="interest-tag-input" 
+            class="form-control" 
+            placeholder="e.g. Flutter Mobile Dev, Machine Learning, UI/UX"
+          >
+          <button type="button" id="add-interest-tag-btn" class="btn btn-secondary btn-sm" style="white-space: nowrap;">
+            Add Skill
+          </button>
+        </div>
+
+        <!-- Hidden input storing comma-separated values for backend submission -->
+        <input type="hidden" name="learning_interests" id="learning_interests" value="{{ interests_str }}">
+
+        <!-- Dynamic tags container -->
+        <div id="interests-tags-container" style="display: flex; flex-wrap: wrap; min-height: 40px; background: rgba(0,0,0,0.25); border: 1px dashed var(--border-glass); border-radius: var(--radius-sm); padding: 0.5rem;">
+          {% for interest in user.learning_interests.all() %}
+            <span class="badge badge-category interest-badge" data-value="{{ interest.skill_name }}" style="display: inline-flex; align-items: center; gap: 6px; margin: 4px;">
+              {{ interest.skill_name }}
+              <button type="button" class="remove-tag-btn" style="background: none; border: none; color: #fff; cursor: pointer; font-weight: bold;">&times;</button>
+            </span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Preferred Mode & Languages -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="edit_preferred_mode" class="form-label">Preferred Learning Mode</label>
+          <select id="edit_preferred_mode" name="preferred_mode" class="form-control">
+            <option value="Online" {% if user.preferred_mode == 'Online' %}selected{% endif %}>Online</option>
+            <option value="In-Person" {% if user.preferred_mode == 'In-Person' %}selected{% endif %}>In-Person</option>
+            <option value="Hybrid" {% if user.preferred_mode == 'Hybrid' %}selected{% endif %}>Hybrid</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="edit_preferred_language" class="form-label">Preferred Language</label>
+          <input 
+            type="text" 
+            id="edit_preferred_language" 
+            name="preferred_language" 
+            class="form-control" 
+            value="{{ user.preferred_language or 'English' }}"
+          >
+        </div>
+      </div>
+
+      <!-- Availability Details -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="edit_availability_days" class="form-label">Available Days</label>
+          <input 
+            type="text" 
+            id="edit_availability_days" 
+            name="availability_days" 
+            class="form-control" 
+            value="{{ user.availability_days or 'Monday, Wednesday, Friday' }}"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="edit_availability_times" class="form-label">Available Times</label>
+          <input 
+            type="text" 
+            id="edit_availability_times" 
+            name="availability_times" 
+            class="form-control" 
+            value="{{ user.availability_times or '6:00 PM - 8:30 PM' }}"
+          >
+        </div>
+      </div>
+
+      <!-- Submit Actions -->
+      <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1.5rem;">
+        <a href="{{ url_for('profile') }}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-cyan">Save Profile Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+{% endblock %}
